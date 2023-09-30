@@ -6,20 +6,20 @@
 #    By: jareste- <jareste-@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/09/29 14:38:53 by jareste-          #+#    #+#              #
-#    Updated: 2023/09/29 14:39:15 by jareste-         ###   ########.fr        #
+#    Updated: 2023/09/30 09:09:20 by jareste-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME = Bureaucrat
+NAME = ScalarConverter
 
 #########
 RM = rm -f
 CC = c++
-CFLAGS = -Werror -Wextra -Wall -std=c++98# -g -fsanitize=address
+CFLAGS = -Werror -Wextra -Wall -std=c++98 -g -fsanitize=address
 #########
 
 #########
-FILES = main Bureaucrat AForm PresidentialPardonForm RobotomyRequestForm ShrubberyCreationForm
+FILES = main ScalarConverter
 
 SRC = $(addsuffix .cpp, $(FILES))
 
