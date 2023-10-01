@@ -6,7 +6,7 @@
 /*   By: jareste- <jareste-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/29 14:41:43 by jareste-          #+#    #+#             */
-/*   Updated: 2023/09/30 20:38:53 by jareste-         ###   ########.fr       */
+/*   Updated: 2023/10/01 19:55:10 by jareste-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,17 +27,18 @@ ScalarConverter	&ScalarConverter::operator=(const ScalarConverter& scalarconvert
 
 bool	ScalarConverter::isChar(std::string scalar)
 {
-	std::cout << "char" << std::endl;
-
 	if ((int)scalar.length() == 3 && scalar[0] == '\'' && scalar[2] == '\'')
+	{
 		if (std::isprint(scalar[1]))
 			return (true);
+	}
+	else if ((int)scalar.length() != 3 && scalar[0] == '\'')
+		throw std::logic_error("Parsing error, invalid input.");
 	return (false);
 }
 
 bool	ScalarConverter::isInt(std::string scalar)
 {
-	std::cout << "int" << std::endl;
 	for (int i = 0; i < (int)scalar.length(); i++)
 		if (scalar[i] == '.' && !std::isdigit(scalar[i]))
 			return (false);
@@ -47,16 +48,13 @@ bool	ScalarConverter::isInt(std::string scalar)
 bool	ScalarConverter::isFloat(std::string scalar)		
 {
 	bool	dot = false;
-	std::cout << "float" << std::endl;
 
 	for (int i = 0; i < (int)scalar.length(); i++)
 		if (!std::isdigit(scalar[i]))
 		{
 			if (scalar[i] == '.' && dot == false)
 				dot = true;
-			else if (scalar[i] == '.' && dot == true)
-				return (false); //aqui puedo tirar un error incluso
-			if (i == (int)scalar.length() - 1 && scalar[i] == 'f')
+			if (i == (int)scalar.length() - 1 && scalar[i] == 'f' && scalar.length() > 2)
 				return (true);
 		}
 	return (false);
@@ -65,34 +63,36 @@ bool	ScalarConverter::isFloat(std::string scalar)
 bool	ScalarConverter::isDouble(std::string scalar)
 {
 	bool	dot = false;
-	std::cout << "double" << std::endl;
 
 	for (int i = 0; i < (int)scalar.length(); i++)
 	{
+		if (!std::isdigit(scalar[i]) && scalar[i] != '.')
+			return (false);
 		if (scalar[i] == '.' && dot == false)
 			dot = true;
 		else if (scalar[i] == '.' && dot == true)
-			return (false); //aqui puedo tirar un error incluso
+			return (false);
 	}
+	if (scalar.length() < 2)
+		return (false);
 	return (true);
 }
 
 int		ScalarConverter::checkType(std::string scalar)
 {
-	bool	(ScalarConverter::*whichType[4])(std::string scalar) = 
+	bool	(*whichType[4])(std::string scalar) = 
 	{&ScalarConverter::isChar, \
 	 &ScalarConverter::isInt , \
 	 &ScalarConverter::isFloat , \
 	 &ScalarConverter::isDouble };
-
-	for (int i = 0; i <  5; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		if (i == 4)
 			return (4);
-		if ((this->*whichType[i])(scalar) == true)
-			return (i);
+		if ((whichType[i])(scalar) == true)
+			return (i + 1);
 	}
-	return (0);
+	return (0); //never will get there.
 }
 
 bool	ScalarConverter::parseInput(std::string scalar)
@@ -100,33 +100,154 @@ bool	ScalarConverter::parseInput(std::string scalar)
 	bool			dot = false;
 	unsigned int	quote = 0;
 
-	if (isChar(scalar))
-		return (true);//si es char es valid input
-	for (int i = 0; i < (int)scalar.length(); i++)
+	try
 	{
-		if (scalar[i] == '.' && dot == false)
-			dot = true;
-		else if (scalar[i] == '.' && dot == true)
-			throw std::logic_error("Parsing error, double dot.");
-		else if (scalar[i] == '\'')
+		if (scalar == "." || scalar == ".f" || scalar == "")
+			throw std::logic_error("Parsing error, invalid digit.");
+		if (isChar(scalar))
+			return (true);//si es char es valid input
+		for (int i = 0; i < (int)scalar.length(); i++)
 		{
-			if (++quote >= 3)
-				throw std::logic_error("Parsing error, quote not closed or more than 2 quotes.");
+			if (scalar[i] == '.' && dot == false)
+				dot = true;
+			else if (scalar[i] == '.' && dot == true)
+				throw std::logic_error("Parsing error, double dot.");
+			else if (scalar[i] == '\'')
+			{
+				if (++quote >= 3)
+					throw std::logic_error("Parsing error, quote not closed or more than 2 quotes.");
+			}
+			else if (i == (int)scalar.length() - 1 && scalar[i] == 'f' && dot == true)
+				return (true);
+			else if (!std::isdigit(scalar[i]))
+					throw std::logic_error("Parsing error, invalid digit.");
 		}
-		else if (!std::isdigit(scalar[i]))
-				throw std::logic_error("Parsing error, invalid digit.");
+		if (quote != 2 && quote != 0)
+			throw std::logic_error("Parsing error, quote not closed or more than 2 quotes.");
 	}
-	if (quote != 2)
-		throw std::logic_error("Parsing error, quote not closed or more than 2 quotes.");
+	catch (const std::logic_error &e)
+	{
+		std::cout << e.what() << std::endl;
+		return (false);
+	}
 	return (true);
+}
+
+void	ScalarConverter::writeChar(char c)
+{
+	std::cout << "Char: " << c << std::endl;
+	int i = static_cast<int>(c);
+	std::cout << "Int: " << i << std::endl;
+	float f = static_cast<float>(c);
+	std::cout << "Float: " << f << "f" << std::endl;
+	double d = static_cast<double>(c);
+	std::cout << "Double: " << d << std::endl;
+}
+
+void	ScalarConverter::writeInt(int i)
+{
+	char c = static_cast<char>(i);
+	if (std::isprint(c) && (i < 127 && i > 0))
+		std::cout << "Char: " << c << std::endl;
+	else	
+		std::cout << "Char: " << "Out of range" << std::endl;
+
+	std::cout << "Int: " << i << std::endl;
+	
+	float f = static_cast<float>(i);
+	std::cout << "Float: " << f << "f" << std::endl;
+	
+	double d = static_cast<double>(i);
+	std::cout << "Double: " << d << std::endl;
+}
+
+void	ScalarConverter::writeFloat(float f)
+{
+	char c = static_cast<char>(f);
+	if (std::isprint(c) && (f < 127 && f > 0))
+		std::cout << "Char: " << c << std::endl;
+	else	
+		std::cout << "Char: " << "Out of range" << std::endl;
+	
+	int i = static_cast<int>(f);
+	if (f < INT_MAX && f > INT_MIN)
+		std::cout << "Int: " << i << std::endl;
+	else
+		std::cout << "Int: " << "Out of range" << std::endl;
+
+	std::cout << "Float: " << f << "f" << std::endl;
+	
+	double d = static_cast<double>(f);
+	std::cout << "Double: " << d << std::endl;
+}
+
+void	ScalarConverter::writeDouble(double d)
+{
+	char c = static_cast<char>(d);
+	if (std::isprint(c) && (d < 127 && d > 0))
+		std::cout << "Char: " << c << std::endl;
+	else
+		std::cout << "Char: " << "Out of range" << std::endl;
+	
+	int i = static_cast<int>(d);
+	if (d < INT_MAX && d > INT_MIN)
+		std::cout << "Int: " << i << std::endl;
+	else
+		std::cout << "Int: " << "Out of range" << std::endl;
+	
+	float f = static_cast<float>(d);
+	if (d < FLT_MAX && d > FLT_MIN)
+		std::cout << "Float: " << f << "f" << std::endl;
+	else
+		std::cout << "Float: " << "Out of range" << std::endl;
+	
+	std::cout << "Double: " << d << std::endl;
 }
 
 void	ScalarConverter::convert(std::string scalar)
 {
-	ScalarConverter aux;
-	// std::cout << 
-	aux.parseInput(scalar);
-	 // << std::endl;
+	std::cout << std::fixed << std::setprecision(1);
+
+
+	if (parseInput(scalar))
+		try
+		{
+			switch (checkType(scalar))
+			{
+				case 1: //CHAR
+				{
+					char c = scalar[1];
+					writeChar(c);
+					break ;
+				}
+				case 2:	//INT
+				{
+					int i = std::stoi(scalar);
+					writeInt(i);
+					break ;
+				}
+				case 3: //FLOAT
+				{
+					float f = stof(scalar);
+					writeFloat(f);
+					break ;
+				}
+				case 4: //DOUBLE
+				{
+					double d = stod(scalar);
+					std::cout << d << std::endl << std::endl;
+					writeDouble(d);
+					break ;
+				}
+				default:
+					std::cout << "switch default::::::::::::::::::::::::::::::::::::::::::::" << std::endl;
+					break ;	
+			}
+		}
+		catch (const std::out_of_range &e)
+		{
+			std::cout << e.what() << std::endl;
+		}
 }
 
 
