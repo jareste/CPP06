@@ -6,7 +6,7 @@
 /*   By: jareste- <jareste-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/29 14:41:39 by jareste-          #+#    #+#             */
-/*   Updated: 2023/10/01 19:42:26 by jareste-         ###   ########.fr       */
+/*   Updated: 2023/10/02 12:50:43 by jareste-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ class ScalarConverter
 		static void	writeInt(int i);
  		static void	writeFloat(float f);
 		static void	writeDouble(double d);
+		static void	writeInfCase(std::string scalar);
 	public:
 		static void	convert(std::string scalar);
 };

@@ -6,7 +6,7 @@
 /*   By: jareste- <jareste-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/29 14:41:43 by jareste-          #+#    #+#             */
-/*   Updated: 2023/10/01 19:55:10 by jareste-         ###   ########.fr       */
+/*   Updated: 2023/10/02 15:30:21 by jareste-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,12 +102,14 @@ bool	ScalarConverter::parseInput(std::string scalar)
 
 	try
 	{
-		if (scalar == "." || scalar == ".f" || scalar == "")
+		if (scalar == "." || scalar == ".f" || scalar == "" || scalar == "-" || scalar == "-." || scalar == "-.f" )
 			throw std::logic_error("Parsing error, invalid digit.");
 		if (isChar(scalar))
 			return (true);//si es char es valid input
 		for (int i = 0; i < (int)scalar.length(); i++)
 		{
+			if (scalar[i] == '-' && i == 0)
+				continue ;
 			if (scalar[i] == '.' && dot == false)
 				dot = true;
 			else if (scalar[i] == '.' && dot == true)
@@ -155,7 +157,10 @@ void	ScalarConverter::writeInt(int i)
 	std::cout << "Int: " << i << std::endl;
 	
 	float f = static_cast<float>(i);
-	std::cout << "Float: " << f << "f" << std::endl;
+	if (i < FLT_MAX && i > -FLT_MAX)
+		std::cout << "Float: " << f << "f" << std::endl;
+	else
+		std::cout << "Float: " << "Out of range" << std::endl;
 	
 	double d = static_cast<double>(i);
 	std::cout << "Double: " << d << std::endl;
@@ -196,7 +201,7 @@ void	ScalarConverter::writeDouble(double d)
 		std::cout << "Int: " << "Out of range" << std::endl;
 	
 	float f = static_cast<float>(d);
-	if (d < FLT_MAX && d > FLT_MIN)
+	if (d < FLT_MAX && d > -FLT_MAX)
 		std::cout << "Float: " << f << "f" << std::endl;
 	else
 		std::cout << "Float: " << "Out of range" << std::endl;
@@ -204,12 +209,31 @@ void	ScalarConverter::writeDouble(double d)
 	std::cout << "Double: " << d << std::endl;
 }
 
+void	ScalarConverter::writeInfCase(std::string scalar)
+{
+	if (scalar == "-inf" || scalar == "+inf" || scalar == "nan")
+	{
+		std::cout << "Char: Out of range" << std::endl;
+		std::cout << "Int: Out of range" << std::endl;
+		std::cout << "Float: " << scalar << "f" << std::endl;
+		std::cout << "Double: " << scalar << std::endl;
+		}
+	else
+	{
+		std::cout << "Char: Out of range" << std::endl;
+		std::cout << "Int: Out of range" << std::endl;
+		std::cout << "Float: " << scalar << std::endl;
+		std::cout << "Double: " << scalar.substr(0, scalar.length() - 1) << std::endl;
+	}
+}
+
 void	ScalarConverter::convert(std::string scalar)
 {
 	std::cout << std::fixed << std::setprecision(1);
 
-
-	if (parseInput(scalar))
+	if (scalar == "-inf" || scalar == "-inff" || scalar == "+inf" || scalar == "+inff" || scalar == "nanf" || scalar == "nan")
+		writeInfCase(scalar);
+	else if (parseInput(scalar))
 		try
 		{
 			switch (checkType(scalar))
@@ -235,7 +259,6 @@ void	ScalarConverter::convert(std::string scalar)
 				case 4: //DOUBLE
 				{
 					double d = stod(scalar);
-					std::cout << d << std::endl << std::endl;
 					writeDouble(d);
 					break ;
 				}
