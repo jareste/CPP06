@@ -6,7 +6,7 @@
 /*   By: jareste- <jareste-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/29 14:41:43 by jareste-          #+#    #+#             */
-/*   Updated: 2023/10/02 15:30:21 by jareste-         ###   ########.fr       */
+/*   Updated: 2023/10/02 15:35:31 by jareste-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ int		ScalarConverter::checkType(std::string scalar)
 		if ((whichType[i])(scalar) == true)
 			return (i + 1);
 	}
-	return (0); //never will get there.
+	return (0); 
 }
 
 bool	ScalarConverter::parseInput(std::string scalar)
@@ -105,7 +105,7 @@ bool	ScalarConverter::parseInput(std::string scalar)
 		if (scalar == "." || scalar == ".f" || scalar == "" || scalar == "-" || scalar == "-." || scalar == "-.f" )
 			throw std::logic_error("Parsing error, invalid digit.");
 		if (isChar(scalar))
-			return (true);//si es char es valid input
+			return (true);
 		for (int i = 0; i < (int)scalar.length(); i++)
 		{
 			if (scalar[i] == '-' && i == 0)
@@ -238,25 +238,25 @@ void	ScalarConverter::convert(std::string scalar)
 		{
 			switch (checkType(scalar))
 			{
-				case 1: //CHAR
+				case 1: 
 				{
 					char c = scalar[1];
 					writeChar(c);
 					break ;
 				}
-				case 2:	//INT
+				case 2:	
 				{
 					int i = std::stoi(scalar);
 					writeInt(i);
 					break ;
 				}
-				case 3: //FLOAT
+				case 3: 
 				{
 					float f = stof(scalar);
 					writeFloat(f);
 					break ;
 				}
-				case 4: //DOUBLE
+				case 4: 
 				{
 					double d = stod(scalar);
 					writeDouble(d);
